@@ -40,22 +40,36 @@ app.MapRazorPages()
 app.MapControllers();
 
 // --- BAGIAN SEEDER DATA ---
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<ApplicationDbContext>();
     
-    // Memastikan database dan tabel sudah terbentuk
+    // Pastikan database dan tabel terbentuk
     context.Database.EnsureCreated();
 
-    // Cek apakah tabel Peminjamans masih kosong
+    // 1. SEED DATA RUANGAN (Daftar Gedung Tetap)
+    if (!context.Ruangans.Any())
+    {
+        context.Ruangans.AddRange(
+            new Backend.Models.Ruangan { NamaRuangan = "Gedung D4" },
+            new Backend.Models.Ruangan { NamaRuangan = "Gedung D3" },
+            new Backend.Models.Ruangan { NamaRuangan = "Gedung Pasca Sarjana" },
+            new Backend.Models.Ruangan { NamaRuangan = "Gedung SAW" }
+        );
+        context.SaveChanges();
+        Console.WriteLine("Data Ruangan berhasil ditambahkan!");
+    }
+
+    // 2. SEED DATA PEMINJAMAN (Contoh Transaksi)
     if (!context.Peminjamans.Any())
     {
         context.Peminjamans.AddRange(
             new Backend.Models.Peminjaman 
             { 
                 NamaPeminjam = "Refa Brillian", 
-                NamaRuangan = "Lab ICT", 
+                NamaRuangan = "Gedung D4", 
                 TanggalMulai = DateTime.Now, 
                 TanggalSelesai = DateTime.Now.AddHours(2), 
                 Status = "Disetujui",
@@ -64,7 +78,7 @@ using (var scope = app.Services.CreateScope())
             new Backend.Models.Peminjaman 
             { 
                 NamaPeminjam = "Andi Saputra", 
-                NamaRuangan = "Aula Utama", 
+                NamaRuangan = "Gedung D3", 
                 TanggalMulai = DateTime.Now.AddDays(1), 
                 TanggalSelesai = DateTime.Now.AddDays(1).AddHours(3), 
                 Status = "Menunggu",
@@ -73,7 +87,7 @@ using (var scope = app.Services.CreateScope())
             new Backend.Models.Peminjaman 
             { 
                 NamaPeminjam = "Siti Aminah", 
-                NamaRuangan = "Ruang Rapat A", 
+                NamaRuangan = "Gedung Pasca Sarjana", 
                 TanggalMulai = DateTime.Now.AddDays(2), 
                 TanggalSelesai = DateTime.Now.AddDays(2).AddHours(1), 
                 Status = "Menunggu",
@@ -82,25 +96,18 @@ using (var scope = app.Services.CreateScope())
             new Backend.Models.Peminjaman 
             { 
                 NamaPeminjam = "Budi Doremi", 
-                NamaRuangan = "Lab RPL", 
+                NamaRuangan = "Gedung SAW", 
                 TanggalMulai = DateTime.Now.AddDays(3), 
                 TanggalSelesai = DateTime.Now.AddDays(3).AddHours(4), 
                 Status = "Ditolak",
                 IsDeleted = false 
-            },
-            new Backend.Models.Peminjaman 
-            { 
-                NamaPeminjam = "Dewi Lestari", 
-                NamaRuangan = "Lab Jaringan", 
-                TanggalMulai = DateTime.Now.AddDays(4), 
-                TanggalSelesai = DateTime.Now.AddDays(4).AddHours(2), 
-                Status = "Disetujui",
-                IsDeleted = false 
             }
         );
-        // Simpan semua data ke database
         context.SaveChanges();
+        Console.WriteLine("Data Peminjaman berhasil ditambahkan!");
     }
 }
+    
+
 
 app.Run();
