@@ -16,6 +16,24 @@ namespace Backend.Controllers
             _context = context;
         }
 
+        public class StatusUpdateDto
+        {   
+            public string NewStatus { get; set; } = string.Empty;
+        }
+
+        [HttpPatch("{id}/status")]
+public async Task<IActionResult> UpdateStatus(int id, [FromBody] StatusUpdateDto request) // Pakai DTO di sini
+{
+    var peminjaman = await _context.Peminjamans.FindAsync(id);
+    if (peminjaman == null) return NotFound();
+
+    // Ambil data dari request.NewStatus
+    peminjaman.Status = request.NewStatus; 
+    await _context.SaveChangesAsync();
+
+    return Ok(peminjaman);
+}
+
         // 1. READ: Mendapatkan semua data peminjaman yang tidak dihapus (Soft Delete)
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Peminjaman>>> GetPeminjamans()
@@ -71,5 +89,7 @@ namespace Backend.Controllers
 
             return NoContent();
         }
+
+        
     }
 }
